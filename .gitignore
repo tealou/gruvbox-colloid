@@ -1,0 +1,17 @@
+# macOS
+.DS_Store
+
+# Editors
+*.swp
+.vscode/
+.idea/
+
+# Git
+*.orig
+
+# Build/install artifacts
+# (theme source lives in the repo; installed outputs go elsewhere)
+
+# Logs / temp
+*.log
+/tmp/
