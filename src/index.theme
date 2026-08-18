@@ -1,6 +1,6 @@
 [Icon Theme]
-Name=GruvBox-Colloid
-Comment=GruvBox-Plus scalable icons over Colloid base
+Name=Colloid
+Comment=Flat clean style icon theme for linux.
 Inherits=hicolor,breeze
 Example=folder
 
