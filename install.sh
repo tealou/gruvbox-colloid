@@ -19,9 +19,14 @@ THEME_VARIANTS=('' '-Purple' '-Pink' '-Red' '-Orange' '-Yellow' '-Green' '-Teal'
 SCHEME_VARIANTS=('' '-Nord' '-Dracula' '-Gruvbox' '-Everforest' '-Catppuccin')
 COLOR_VARIANTS=('-Light' '-Dark' '')
 
+# Gruvbox-Plus folder colours (KDE-compatible via folder-<colour>-<name>.svg naming)
+FOLDER_COLORS="black blue caramel citron firebrick gold green grey highland jade lavender lime olive orange pistachio plasma pumpkin purple red rust sapphire tomato violet white yellow"
+FOLDER_DEFAULT="plasma"
+
 themes=()
 schemes=()
 colors=()
+folder_color="${FOLDER_DEFAULT}"
 
 usage() {
 cat << EOF
@@ -30,14 +35,15 @@ cat << EOF
   OPTIONS:
     -d, --dest DIR          Specify destination directory (Default: $DEST_DIR)
     -n, --name NAME         Specify theme name (Default: $THEME_NAME)
-    -s, --scheme VARIANTS   Specify folder colorscheme variant(s) [default|nord|dracula|gruvbox|everforest|catppuccin|all]
-    -t, --theme VARIANTS    Specify folder color theme variant(s) [default|purple|pink|red|orange|yellow|green|teal|grey|all] (Default: blue)
+    -c, --color COLOR       Set folder color (Default: plasma)
     -a, --alternative       Install alternative icons for software center and file-manager
     -p, --kde-plasma        Replaces Apple logo with KDE Plasma logo.
     -b, --bold              Install bolder panel icons version (1.5px size)
-    -notint, --notint       Disable Follow ColorSheme for folders on KDE Plasma
     -r, --remove, -u, --uninstall   Remove/Uninstall $THEME_NAME icon themes
     -h, --help              Show help
+
+  FOLDER COLORS:
+    $FOLDER_COLORS
 EOF
 }
 
@@ -61,11 +67,7 @@ install() {
   if [[ "${color}" == '-Light' ]]; then
     cp -r "${SRC_DIR}"/src/{actions,apps,categories,devices,emblems,mimetypes,places,status} "${THEME_DIR}"
 
-    notint_folder
-
-    if [[ "${scheme}" != '' || "${theme}" != '' ]]; then
-      sed -i "s/#60c0f0/${theme_color}/g"                                                   "${THEME_DIR}"/apps/scalable/*.svg
-    fi
+    choose_folder_color "${THEME_DIR}"/places/scalable
 
     if [[ ${bold:-} == 'true' ]]; then
       cp -r "${SRC_DIR}"/bold/*                                                             "${THEME_DIR}"
@@ -121,7 +123,7 @@ install() {
     sed -i "s/#363636/#dedede/g" "${THEME_DIR}"/categories/22/*.svg
     sed -i "s/#363636/#dedede/g" "${THEME_DIR}"/{actions,apps,categories,devices,emblems,mimetypes,places,status}/symbolic/*.svg
 
-    notint_folder
+    choose_folder_color "${THEME_DIR}"/places/scalable
 
     cp -r "${SRC_DIR}"/links/actions/{16,22,24,32,symbolic}                                 "${THEME_DIR}"/actions
     cp -r "${SRC_DIR}"/links/devices/{16,22,24,32,symbolic}                                 "${THEME_DIR}"/devices
@@ -197,19 +199,6 @@ install() {
   fi
 
   gtk-update-icon-cache "${THEME_DIR}"
-}
-
-notint_folder() {
-    if [[ "${theme}" == '' && "${scheme}" == '' && "${notint}" == 'true' ]]; then
-      cp -r "${SRC_DIR}"/notint/*.svg                                                       "${THEME_DIR}"/places/scalable
-    fi
-
-    colors_folder
-
-    if [[ "${scheme}" != '' || "${theme}" != '' ]]; then
-      cp -r "${SRC_DIR}"/notint/*.svg                                                       "${THEME_DIR}"/places/scalable
-      sed -i "s/#60c0f0/${theme_color}/g"                                                   "${THEME_DIR}"/places/scalable/*.svg
-    fi
 }
 
 colors_folder() {
@@ -404,6 +393,34 @@ colors_folder() {
   fi
 }
 
+# choose_folder_color <places_scalable_dir>
+# Point every plain folder-<name>.svg at the chosen colour's artwork.
+# The theme ships only the real coloured files (folder-<colour>-<name>.svg).
+# At install time we create the plain-name symlinks so KDE/Plasma resolves
+# folder-games.svg etc. to the selected colour. Mirrors Gruvbox's chooser.
+choose_folder_color() {
+  local dir="$1"
+  local color="${folder_color:-${FOLDER_DEFAULT}}"
+
+  echo "  Applying folder color: ${color}"
+  (
+    cd "$dir" || exit 1
+    # For every real colour variant folder-<color>-<name>.svg, link the plain
+    # name folder-<name>.svg to it (only if no plain real file is present).
+    for f in folder-"${color}"-*.svg; do
+      [[ -f "$f" ]] || continue
+      plain="${f/folder-${color}-/folder-}"
+      if [[ ! -e "$plain" ]]; then
+        ln -s "$f" "$plain"
+      fi
+    done
+    # Bare folder-<color>.svg -> folder.svg (the default folder example icon)
+    if [[ -f "folder-${color}.svg" && ! -e "folder.svg" ]]; then
+      ln -s "folder-${color}.svg" "folder.svg"
+    fi
+  )
+}
+
 while [[ "$#" -gt 0 ]]; do
   case "${1:-}" in
     -d|--dest)
@@ -414,6 +431,16 @@ while [[ "$#" -gt 0 ]]; do
     -n|--name)
       name="${2}"
       shift 2
+      ;;
+    -c|--color)
+      folder_color="${2}"
+      shift 2
+      if [[ ! "${FOLDER_COLORS}" =~ (^|[[:space:]])"${folder_color}"([[:space:]]|$) ]]; then
+        echo "ERROR: Unrecognized folder color '$folder_color'."
+        echo "Available colors: $FOLDER_COLORS"
+        exit 1
+      fi
+      echo -e "\nFolder color: ${folder_color}\n"
       ;;
     -r|--remove|-u|--uninstall)
       remove='true'
