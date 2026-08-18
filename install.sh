@@ -89,7 +89,7 @@ install() {
   fi
 
   if [[ "${color}" == '-Dark' ]]; then
-    mkdir -p                                                                                "${THEME_DIR}"/{apps,categories,devices,emblems,mimetypes,places,status}
+    mkdir -p                                                                                "${THEME_DIR}"/{apps,categories,devices,emblems,mimetypes,places,status,preferences}
     cp -r "${SRC_DIR}"/src/actions                                                          "${THEME_DIR}"
     cp -r "${SRC_DIR}"/src/apps/{22,symbolic}                                               "${THEME_DIR}"/apps
     cp -r "${SRC_DIR}"/src/categories/{22,symbolic}                                         "${THEME_DIR}"/categories
@@ -98,7 +98,7 @@ install() {
     cp -r "${SRC_DIR}"/src/devices/{16,22,24,32,symbolic}                                   "${THEME_DIR}"/devices
     cp -r "${SRC_DIR}"/src/places/{16,22,24,scalable,symbolic}                              "${THEME_DIR}"/places
     cp -r "${SRC_DIR}"/src/status/{16,22,24,32,symbolic}                                    "${THEME_DIR}"/status
-    cp -r "${SRC_DIR}"/src/preferences/symbolic                                            "${THEME_DIR}"/preferences
+    cp -r "${SRC_DIR}"/src/preferences/symbolic                                            "${THEME_DIR}"/preferences/symbolic
 
     cp -r "${SRC_DIR}"/dark/*.svg                                                           "${THEME_DIR}"/places/scalable
 
