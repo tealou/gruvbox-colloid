@@ -65,7 +65,7 @@ install() {
   sed -i "s/Colloid/${2}${3}${4}${5}/g"                                                     "${THEME_DIR}"/index.theme
 
   if [[ "${color}" == '-Light' ]]; then
-    cp -r "${SRC_DIR}"/src/{actions,apps,categories,devices,emblems,mimetypes,places,status,preferences} "${THEME_DIR}"
+    cp -r "${SRC_DIR}"/src/{actions,apps,categories,devices,emblems,mimetypes,places,status} "${THEME_DIR}"
 
     choose_folder_color "${THEME_DIR}"/places/scalable
 
@@ -89,7 +89,7 @@ install() {
   fi
 
   if [[ "${color}" == '-Dark' ]]; then
-    mkdir -p                                                                                "${THEME_DIR}"/{apps,categories,devices,emblems,mimetypes,places,status,preferences}
+    mkdir -p                                                                                "${THEME_DIR}"/{apps,categories,devices,emblems,mimetypes,places,status}
     cp -r "${SRC_DIR}"/src/actions                                                          "${THEME_DIR}"
     cp -r "${SRC_DIR}"/src/apps/{22,symbolic}                                               "${THEME_DIR}"/apps
     cp -r "${SRC_DIR}"/src/categories/{22,symbolic}                                         "${THEME_DIR}"/categories
@@ -98,7 +98,6 @@ install() {
     cp -r "${SRC_DIR}"/src/devices/{16,22,24,32,symbolic}                                   "${THEME_DIR}"/devices
     cp -r "${SRC_DIR}"/src/places/{16,22,24,scalable,symbolic}                              "${THEME_DIR}"/places
     cp -r "${SRC_DIR}"/src/status/{16,22,24,32,symbolic}                                    "${THEME_DIR}"/status
-    cp -r "${SRC_DIR}"/src/preferences/symbolic                                            "${THEME_DIR}"/preferences/symbolic
 
     cp -r "${SRC_DIR}"/dark/*.svg                                                           "${THEME_DIR}"/places/scalable
 
@@ -134,7 +133,6 @@ install() {
     cp -r "${SRC_DIR}"/links/categories/{22,symbolic}                                       "${THEME_DIR}"/categories
     cp -r "${SRC_DIR}"/links/emblems/symbolic                                               "${THEME_DIR}"/emblems
     cp -r "${SRC_DIR}"/links/mimetypes/symbolic                                             "${THEME_DIR}"/mimetypes
-    cp -r "${SRC_DIR}"/links/preferences/symbolic                                           "${THEME_DIR}"/preferences
 
     cd "${dest}"
     ln -sf ../../"${name}${theme}${scheme}"-Light/apps/scalable "${name}${theme}${scheme}"-Dark/apps/scalable
